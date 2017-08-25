@@ -4,5 +4,6 @@ set offsets 0,3,2,0
 set xtics 10
 set ylabel "Latency (ms)"
 set xlabel "No. of Concurrent Client"
+set key off
 
 plot "out.data" with lines ls 1, "out.data" using 1:2:3:4 with errorbars ls 2

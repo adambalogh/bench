@@ -1,9 +1,11 @@
+#! /usr/bin/python
+
 import os
 import subprocess
 import csv
 
-URL = 'http://localhost:3000/'
-REQUESTS = 1000
+URL = 'http://localhost:8080/'
+REQUESTS = 5000
 
 FNULL = open(os.devnull, 'w')
 
@@ -33,8 +35,20 @@ def run(num_clients):
         ], stdout=FNULL)
     return file_name
 
+def warmup():
+    print 'warming up server...'
+    subprocess.check_call([
+        "ab",
+        "-c %d " % 10,
+        "-n %d" % (10000),
+        URL
+        ], stdout=FNULL)
+
 
 def main():
+    # warmup the server
+    warmup()
+
     tests = [1, 5, 10, 20, 50, 100]
     results = {}
 
@@ -58,6 +72,8 @@ def main():
                     out[num_client].low = latency
                 if percentile == 80:
                     out[num_client].high = latency
+        # remove file, we don't need it anymore
+        os.remove(file_name)
 
     with open('out.data', 'w') as f:
         for t in tests:
